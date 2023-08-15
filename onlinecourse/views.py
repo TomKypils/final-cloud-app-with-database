@@ -145,5 +145,23 @@ def extract_answers(request):
         # Calculate the total score
 #def show_exam_result(request, course_id, submission_id):
 
+def show_exam_result(request, course_id, submission_id):
+    course = get_object_or_404(Course, pk=course_id)
+    submission = get_object_or_404(Submission, pk=submission_id)
+    choices = submission.choices.all()
+    total_mark, mark = 0, 0
+    for question in course.question_set.all():
+        total_mark += question.grade
+        if question.is_get_score(choices):
+            mark += question.grade
+    
+    return render(
+        request,
+        'onlinecourse/exam_result_bootstrap.html',
+        {"course":course, "choices":choices,"mark":mark, 
+            "total_mark": total_mark, 
+            "submission": submission,
+            "grade": int((mark / total_mark) * 100) }
+    )
 
 
